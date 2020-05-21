@@ -1,9 +1,10 @@
 #For QSSI, we build only the system image. Here we explicitly set the images
 #we build so there is no confusion.
+
 PRODUCT_BUILD_SYSTEM_IMAGE := true
 PRODUCT_BUILD_SYSTEM_OTHER_IMAGE := false
 PRODUCT_BUILD_VENDOR_IMAGE := false
-PRODUCT_BUILD_PRODUCT_SERVICES_IMAGE := false
+PRODUCT_BUILD_SYSTEM_EXT_IMAGE := false
 PRODUCT_BUILD_ODM_IMAGE := false
 PRODUCT_BUILD_CACHE_IMAGE := false
 PRODUCT_BUILD_USERDATA_IMAGE := false
@@ -14,6 +15,9 @@ TARGET_SKIP_OTA_PACKAGE := true
 
 # Enable AVB 2.0
 BOARD_AVB_ENABLE := true
+
+# Set SYSTEMEXT_SEPARATE_PARTITION_ENABLE if was not already set (set earlier via build.sh).
+SYSTEMEXT_SEPARATE_PARTITION_ENABLE ?= false
 
 #### Dynamic Partition Handling
 
@@ -45,10 +49,17 @@ else
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
 # Disable building the SUPER partition in this build. SUPER should be built
 # after QSSI has been merged with the SoC build.
+ifeq ($(SYSTEMEXT_SEPARATE_PARTITION_ENABLE), true)
+PRODUCT_BUILD_SYSTEM_EXT_IMAGE := true
+endif
 PRODUCT_BUILD_PRODUCT_IMAGE := true
 PRODUCT_BUILD_SUPER_PARTITION := false
 PRODUCT_BUILD_RAMDISK_IMAGE := true
+ifeq ($(SYSTEMEXT_SEPARATE_PARTITION_ENABLE), true)
+BOARD_AVB_VBMETA_SYSTEM := system system_ext product
+else
 BOARD_AVB_VBMETA_SYSTEM := system product
+endif
 BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
@@ -60,31 +71,14 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/google/av \
     hardware/google/interfaces
 
-# define flag to determine the kernel
-TARGET_KERNEL_VERSION := $(shell ls kernel | grep "msm-*" | sed 's/msm-//')
-
-# Set flags for 4.14 and higher kernels
-ifeq ($(TARGET_KERNEL_VERSION),$(filter $(TARGET_KERNEL_VERSION),3.18 4.4 4.9))
-TARGET_USES_NEW_ION := false
-else
-TARGET_USES_NEW_ION := true
-#Enable llvm support for kernel
-KERNEL_LLVM_SUPPORT := true
-#Enable sd-llvm suppport for kernel
-KERNEL_SD_LLVM_SUPPORT := true
-endif
-
-ifeq ($(TARGET_KERNEL_VERSION),$(filter $(TARGET_KERNEL_VERSION),4.19))
-TEMPORARY_DISABLE_PATH_RESTRICTIONS := true
-export TEMPORARY_DISABLE_PATH_RESTRICTIONS
-endif
-
 VENDOR_QTI_PLATFORM := msmnile
 VENDOR_QTI_DEVICE := qssi_32
 
 #QSSI configuration
 #Single system image project structure
 TARGET_USES_QSSI := true
+
+TARGET_USES_NEW_ION := true
 
 ENABLE_AB ?= true
 
@@ -115,9 +109,9 @@ TARGET_USES_RRO := true
 
 TARGET_USES_NQ_NFC := true
 
+
 # default is nosdcard, S/W button enabled in resource
 PRODUCT_CHARACTERISTICS := nosdcard
-
 BOARD_FRP_PARTITION_NAME := frp
 
 #Android EGL implementation
@@ -128,6 +122,8 @@ PRODUCT_BOOT_JARS += telephony-ext
 PRODUCT_PACKAGES += telephony-ext
 
 TARGET_ENABLE_QC_AV_ENHANCEMENTS := false
+
+TARGET_SYSTEM_PROP += device/qcom/qssi_32/system.prop
 
 TARGET_DISABLE_DASH := true
 TARGET_DISABLE_QTI_VPP := true
@@ -141,17 +137,11 @@ endif
 #    PRODUCT_BOOT_JARS += libprotobuf-java_mls
 #endif
 
-# Video codec configuration files
-ifeq ($(TARGET_ENABLE_QC_AV_ENHANCEMENTS), true)
-PRODUCT_PROPERTY_OVERRIDES += \
-    media.settings.xml=/vendor/etc/media_profiles_vendor.xml
-endif #TARGET_ENABLE_QC_AV_ENHANCEMENTS
-
 PRODUCT_PACKAGES += android.hardware.media.omx@1.0-impl
 
 # Audio configuration file
 -include $(TOPDIR)vendor/qcom/opensource/audio-hal/primary-hal/configs/qssi/qssi.mk
--include $(TOPDIR)hardware/qcom/audio/configs/msmnile/msmnile.mk
+-include $(TOPDIR)vendor/qcom/opensource/commonsys/audio/configs/qssi/qssi.mk
 AUDIO_FEATURE_ENABLED_SVA_MULTI_STAGE := true
 USE_LIB_PROCESS_GROUP := true
 
@@ -180,8 +170,7 @@ PRODUCT_PACKAGES += \
     android.hardware.health@1.0-service \
     libhealthd.msm
 
-DEVICE_MATRIX_FILE   := device/qcom/common/compatibility_matrix.xml
-DEVICE_FRAMEWORK_MANIFEST_FILE := device/qcom/qssi/framework_manifest.xml
+DEVICE_FRAMEWORK_MANIFEST_FILE := device/qcom/qssi_32/framework_manifest.xml
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE := vendor/qcom/opensource/core-utils/vendor_framework_compatibility_matrix.xml
 
 #audio related module
@@ -199,9 +188,6 @@ PRODUCT_PACKAGES += android.hardware.camera.provider@2.4-impl
 # Enable binderized camera HAL
 PRODUCT_PACKAGES += android.hardware.camera.provider@2.4-service_64
 
-# Vibrator
-PRODUCT_PACKAGES += \
-    vendor.qti.hardware.vibrator@1.2-service
 
 # Context hub HAL
 PRODUCT_PACKAGES += \
@@ -227,10 +213,13 @@ PRODUCT_PACKAGES += \
 KERNEL_MODULES_INSTALL := dlkm
 KERNEL_MODULES_OUT := out/target/product/$(PRODUCT_NAME)/$(KERNEL_MODULES_INSTALL)/lib/modules
 
-
-#Exclude vibrator from InputManager
+ifneq ($(strip $(TARGET_BUILD_VARIANT)),user)
 PRODUCT_COPY_FILES += \
-    device/qcom/qssi/excluded-input-devices.xml:system/etc/excluded-input-devices.xml
+    device/qcom/qssi_32/init.qcom.testscripts.sh:$(TARGET_COPY_OUT_PRODUCT)/etc/init.qcom.testscripts.sh
+endif
+
+PRODUCT_COPY_FILES += \
+    device/qcom/qssi_32/public.libraries.product-qti.txt:$(TARGET_COPY_OUT_PRODUCT)/etc/public.libraries-qti.txt
 
 #Enable full treble flag
 PRODUCT_FULL_TREBLE_OVERRIDE := true
@@ -238,7 +227,7 @@ PRODUCT_VENDOR_MOVE_ENABLED := true
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
 
 ifneq ($(strip $(TARGET_USES_RRO)),true)
-DEVICE_PACKAGE_OVERLAYS += device/qcom/qssi/overlay
+DEVICE_PACKAGE_OVERLAYS += device/qcom/qssi_32/overlay
 endif
 
 
@@ -247,10 +236,6 @@ PRODUCT_PACKAGES += vndk_package
 
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE:=true
 
-#----------------------------------------------------------------------
-# wlan specific
-#----------------------------------------------------------------------
-include device/qcom/wlan/msmnile/wlan.mk
 
 TARGET_MOUNT_POINTS_SYMLINKS := false
 
@@ -266,6 +251,21 @@ ifeq ($(TARGET_USES_NEW_ION),true)
 AUDIO_FEATURE_ENABLED_DLKM := true
 else
 AUDIO_FEATURE_ENABLED_DLKM := false
+endif
+
+ifeq ($(ENABLE_VIRTUAL_AB), true)
+    $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
+endif
+
+ifeq ($(SYSTEMEXT_SEPARATE_PARTITION_ENABLE), false)
+PRODUCT_PACKAGES += \
+    qti_skip_mount.cfg
+endif
+
+# Include mainline components and QSSI whitelist
+ifeq ($(shell test $(SHIPPING_API_LEVEL) -ge 29; echo $$?),0)
+  $(call inherit-product, device/qcom/qssi_32/qssi_whitelist.mk)
+  PRODUCT_ENFORCE_ARTIFACT_PATH_REQUIREMENTS := true
 endif
 
 ###################################################################################

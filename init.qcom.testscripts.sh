@@ -1,5 +1,7 @@
-# Copyright (c) 2013, The Linux Foundation. All rights reserved.
-#
+#! /system/bin/sh
+
+# Copyright (c) 2015, 2020, The Linux Foundation. All rights reserved.
+# 
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are
 # met:
@@ -12,7 +14,7 @@
 #     * Neither the name of The Linux Foundation nor the names of its
 #       contributors may be used to endorse or promote products derived
 #       from this software without specific prior written permission.
-#
+# 
 # THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 # MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT
@@ -24,5 +26,24 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 
-dev_mount sdcard /storage/sdcard1 auto /devices/msm_sdcc.2/mmc_host
+# This is the file for test teams to trigger their test setup.
+#
+# Sample command: /system/bin/sh /sdcard/command.sh
+# All the output files will be created under root privilege. Please use
+# "adb root" before pulling the generated files.
+
+target=`getprop ro.board.platform`
+
+case "$target" in
+    "msm8996")
+	echo 1 > /sys/kernel/debug/scm_errata/kryo_e76
+	;;
+esac
+
+func_enable=`getprop persist.vendor.sys.rawdump_copy`
+case "$func_enable" in
+    1) runcon u:r:su:s0 /system/bin/sh /system_ext/ramdump_wrapper.sh  2>/dev/null
+	;;
+esac
