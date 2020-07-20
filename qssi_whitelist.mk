@@ -1,4 +1,4 @@
-PRODUCT_ARTIFACT_PATH_REQUIREMENT_WHITELIST += \
+PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
 root/init.recovery.qcom.rc \
 system/app/ODLT/ODLT.apk \
 system/app/Protips/Protips.apk \
@@ -89,7 +89,7 @@ system/priv-app/SnapdragonCamera/SnapdragonCamera.apk \
 system/priv-app/xtra_t_app/xtra_t_app.apk \
 system/usr/keylayout/gpio-keys.kl
 
-PRODUCT_ARTIFACT_PATH_REQUIREMENT_WHITELIST += \
+PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
 system/app/Qmmi/lib/arm64/libmmi_jni.so \
 system/app/Qmmi/oat/arm64/Qmmi.odex \
 system/app/Qmmi/oat/arm64/Qmmi.vdex \
