@@ -77,7 +77,7 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/google/av \
     hardware/google/interfaces
 
-VENDOR_QTI_PLATFORM := qssi_32
+VENDOR_QTI_PLATFORM := msmnile
 VENDOR_QTI_DEVICE := qssi_32
 
 #QSSI configuration
