@@ -53,7 +53,6 @@ system/lib/libeye_tracking_dsp_sample_stub.so \
 system/lib/libjni_imageutil.so \
 system/lib/libjni_snapcammosaic.so \
 system/lib/libjni_snapcamtinyplanet.so \
-system/lib/liblocationservice_jni.so \
 system/lib/libmmi.so \
 system/lib/libmmi_jni.so \
 system/lib/libqvr_cam_cdsp_driver_stub.so \
@@ -67,7 +66,6 @@ system/lib/libqvrservice_ov9282_hvx_tuning.so \
 system/lib/libsensor_calibration.so \
 system/lib/libstagefright_soft_flacdec.so \
 system/lib/libstagefright_softomx.so \
-system/lib/libxt_native.so \
 system/lib/rfsa/adsp/libqvr_dsp_driver_skel.so \
 system/lib/rfsa/adsp/libtracker_6dof_skel_8150.so \
 system/lib64/libOpenCL_system.so \
@@ -75,7 +73,6 @@ system/lib64/libbluetooth-binder.so \
 system/lib64/libjni_imageutil.so \
 system/lib64/libjni_snapcammosaic.so \
 system/lib64/libjni_snapcamtinyplanet.so \
-system/lib64/liblocationservice_jni.so \
 system/lib64/libmediaplayerservice.so \
 system/lib64/libmmi.so \
 system/lib64/libmmi_jni.so \
@@ -84,9 +81,7 @@ system/lib64/libqvrservice_client.qti.so \
 system/lib64/libqvrservice_ov7251_hvx_tuning.so \
 system/lib64/libqvrservice_ov9282_hvx_tuning.so \
 system/lib64/libstagefright_httplive.so \
-system/lib64/libxt_native.so \
 system/priv-app/SnapdragonCamera/SnapdragonCamera.apk \
-system/priv-app/xtra_t_app/xtra_t_app.apk \
 system/usr/keylayout/gpio-keys.kl
 
 PRODUCT_ARTIFACT_PATH_REQUIREMENT_ALLOWED_LIST += \
