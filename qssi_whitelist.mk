@@ -125,4 +125,3 @@ system/lib/android.hardware.nfc@1.2.so \
 system/lib64/android.hardware.nfc@1.0.so \
 system/lib64/android.hardware.nfc@1.1.so \
 system/lib64/android.hardware.nfc@1.2.so \
-system/lib/vendor.qti.hardware.audiohalext-utils.so
