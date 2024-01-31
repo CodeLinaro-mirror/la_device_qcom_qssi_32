@@ -98,10 +98,10 @@ $(call inherit-product, device/qcom/qssi_32/common.mk)
 #Inherit all except heap growth limit from phone-xhdpi-2048-dalvik-heap.mk
 PRODUCT_PROPERTY_OVERRIDES  += \
 	dalvik.vm.heapstartsize=8m \
-	dalvik.vm.heapsize=512m \
+	dalvik.vm.heapsize=256m \
 	dalvik.vm.heaptargetutilization=0.75 \
 	dalvik.vm.heapminfree=512k \
-	dalvik.vm.heapmaxfree=8m
+	dalvik.vm.heapmaxfree=6m
 
 
 PRODUCT_NAME := $(VENDOR_QTI_DEVICE)
@@ -115,6 +115,8 @@ PRODUCT_EXTRA_VNDK_VERSIONS := 30
 TARGET_USES_AOSP := false
 TARGET_USES_AOSP_FOR_AUDIO := false
 TARGET_USES_QCOM_BSP := false
+
+TARGET_USES_NQ_NFC := false
 
 # RRO configuration
 TARGET_USES_RRO := true
@@ -137,11 +139,17 @@ TARGET_ENABLE_QC_AV_ENHANCEMENTS := false
 
 #1G ddr iot project variant flag
 TARGET_1G_DDR_RAM := true
-
+PRODUCT_LOCALES := en_US
 TARGET_SYSTEM_PROP += device/qcom/qssi_32/system.prop
 
 TARGET_DISABLE_DASH := true
 TARGET_DISABLE_QTI_VPP := true
+
+ifeq ($(TARGET_1G_DDR_RAM),true)
+WIDEVINE_ENABLE := false
+ENABLE_WIDEVINE_DRM := false
+TARGET_NOT_SUPPORT_VULKAN :=true
+endif
 
 ifneq ($(TARGET_DISABLE_DASH), true)
     PRODUCT_BOOT_JARS += qcmediaplayer
@@ -211,7 +219,7 @@ PRODUCT_PACKAGES += \
 
 # system prop for enabling QFS (QTI Fingerprint Solution)
 PRODUCT_PROPERTY_OVERRIDES += \
-    persist.vendor.qfp=true
+    persist.vendor.qfp=false
 
 
 # USB default HAL
