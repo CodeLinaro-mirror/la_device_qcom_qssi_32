@@ -38,7 +38,6 @@ QSD8K_BOARD_PLATFORMS := qsd8k
 
 TARGET_USE_VENDOR_CAMERA_EXT := true
 
-TARGET_HAS_LOW_RAM := true
 ifeq ($(TARGET_1G_DDR_RAM), true)
 BOARD_HAVE_QCOM_FM ?= false
 else
