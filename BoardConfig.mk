@@ -3,7 +3,7 @@
 # Product-specific compile-time definitions.
 #
 
-ALLOW_MISSING_DEPENDENCIES := true
+ALLOW_MISSING_DEPENDENCIES := false
 
 TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv8-a
