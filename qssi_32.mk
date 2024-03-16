@@ -136,6 +136,7 @@ TARGET_ENABLE_QC_AV_ENHANCEMENTS := false
 
 #1G ddr iot project variant flag
 TARGET_1G_DDR_RAM := true
+TARGET_HAS_LOW_RAM := true
 PRODUCT_LOCALES := en_US
 TARGET_SYSTEM_PROP += device/qcom/qssi_32/system.prop
 
